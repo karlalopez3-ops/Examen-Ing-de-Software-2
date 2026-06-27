@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen - Ingeniería de Software II</title>
+    <style>
+        /* PALETA DE COLORES (Variables de entorno CSS modernas) */
+        :root {
+            --bg-parchment: #F4EFE6;
+            --bg-sand: #DDD0BA;
+            --accent-olive: #B9C4A6;
+            --component-sage: #8B947A;
+            --button-bark: #655A4C;
+            --text-olivewood: #2C2F25;
+            
+            /* Mapeo del tema dinámico */
+            --main-bg: var(--bg-parchment);
+            --secondary-bg: #FFFFFF;
+            --card-bg: #FFFFFF;
+            --text-main: var(--text-olivewood);
+            --text-muted: #565E4E;
+            --border-color: rgba(139, 148, 122, 0.25);
+            --shadow-sm: 0 2px 8px rgba(44, 47, 37, 0.05);
+            --shadow-md: 0 8px 24px rgba(44, 47, 37, 0.08);
+            --badge-bg: var(--bg-sand);
+            --badge-text: var(--text-olivewood);
+            --answer-bg: rgba(185, 196, 166, 0.15);
+            --answer-border: var(--component-sage);
+        }
+
+        /* Variables alternativas para el MODO OSCURO (Inversión armónica basada en la paleta) */
+        [data-theme="dark"] {
+            --main-bg: #1B1D16;
+            --secondary-bg: #262920;
+            --card-bg: #22251D;
+            --text-main: var(--bg-parchment);
+            --text-muted: var(--accent-olive);
+            --border-color: rgba(221, 208, 186, 0.15);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+            --badge-bg: var(--button-bark);
+            --badge-text: var(--bg-parchment);
+            --answer-bg: rgba(139, 148, 122, 0.12);
+            --answer-border: var(--accent-olive);
+        }
+
+        /* REGLAS GLOBALES Y RESET */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--main-bg);
+            color: var(--text-main);
+            line-height: 1.65;
+            padding: 60px 20px;
+            transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+        }
+
+        /* CARGADOR (LOADING ANIMATION) */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-parchment);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--bg-sand);
+            border-top: 5px solid var(--button-bark);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* CONTENEDOR PRINCIPAL */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            position: relative;
+            transition: background-color 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+        }
+
+        /* CONTROLES FLOTANTES (CAMBIO DE TEMA Y SCROLL TO TOP) */
+        .theme-toggle-container {
+            position: absolute;
+            top: 30px;
+            right: 50px;
+        }
+
+        .btn-theme {
+            background-color: var(--button-bark);
+            color: var(--bg-parchment);
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-theme:hover {
+            transform: translateY(-2px);
+            opacity: 0.95;
+        }
+
+        .btn-theme:active {
+            transform: translateY(0);
+        }
+
+        /* ENCABEZADO */
+        header {
+            text-align: center;
+            margin-bottom: 45px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .logo-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--component-sage);
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            font-size: 15px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* INFORMACIÓN META */
+        .meta-info {
+            background-color: var(--main-bg);
+            padding: 20px 25px;
+            border-radius: 14px;
+            margin-bottom: 40px;
+            border: 1px solid var(--border-color);
+            transition: background-color 0.4s ease, border-color 0.4s ease;
+        }
+
+        .meta-info p {
+            font-size: 14.5px;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+        .meta-info p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ESTRUCTURA DE SECCIONES (FADE-IN CON SCROLL) */
+        .exam-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .exam-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            background-color: var(--component-sage);
+            color: var(--bg-parchment);
+            padding: 12px 20px;
+            margin-top: 50px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            letter-spacing: 1px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .instructions {
+            font-style: italic;
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            padding-left: 5px;
+            border-left: 3px solid var(--accent-olive);
+        }
+
+        /* BLOQUES DE PREGUNTAS (TARJETAS) */
+        .question-block {
+            background-color: var(--main-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease, background-color 0.4s ease, border-color 0.4s ease;
+        }
+
+        /* Efecto de elevación en las tarjetas solicitadas (Hover Lift) */
+        .question-block:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--component-sage);
+        }
+
+        .question-text {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-main);
+            margin-bottom: 15px;
+        }
+
+        /* BLOQUE DE RESPUESTAS */
+        .answer-box {
+            background-color: var(--answer-bg);
+            border-left: 4px solid var(--answer-border);
+            padding: 16px 20px;
+            border-radius: 0 12px 12px 0;
+            font-size: 15px;
+            margin-top: 12px;
+            transition: background-color 0.4s ease;
+        }
+
+        .answer-label {
+            font-weight: 700;
+            color: var(--text-main);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .justification {
+            margin-top: 12px;
+            font-size: 14px;
+            color: var(--text-muted);
+            border-top: 1px dashed var(--border-color);
+            padding-top: 10px;
+        }
+
+        /* ELEMENTOS DE LISTAS INTERNAS */
+        ol, ul {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        li strong {
+            color: var(--text-main);
+        }
+
+        /* CÓDIGO FUENTE RESALTADO */
+        .code-block {
+            font-family: 'Fira Code', 'Courier New', Courier, monospace;
+            background: #23251E;
+            color: #E6E6E6;
+            padding: 18px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            overflow-x: auto;
+            margin-top: 15px;
+            line-height: 1.5;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 10px;
+            }
+            .container {
+                padding: 30px 20px;
+                border-radius: 14px;
+            }
+            .theme-toggle-container {
+                position: static;
+                text-align: right;
+                margin-bottom: 20px;
+            }
+            header h1 {
+                font-size: 22px;
+            }
+            .section-title {
+                font-size: 13px;
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Loader de pantalla completo para transiciones suaves iniciales -->
+<div id="loader">
+    <div class="spinner"></div>
+</div>
+
+<div class="container">
+    
+    <!-- Botón dinámico de cambio de tema -->
+    <div class="theme-toggle-container">
+        <button class="btn-theme" id="themeBtn" aria-label="Cambiar tema visual">
+            <span id="themeIcon">🌙</span> <span id="themeText">Modo Oscuro</span>
+        </button>
+    </div>
+
+    <header>
+        <div class="logo-title">UJCV</div>
+        <h1>Ingeniería de Software II</h1>
+        <p>Periodo 2 – 2026 / Ing. Raul Fernandez</p>
+    </header>
+
+    <div class="meta-info">
+        <p><strong>Estudiante:</strong> Karla Milagro Lopez Rivera (Cta: 2023210326)</p>
+        <p><strong>Instrucciones generales:</strong> Realice el examen en lápiz tinta, color rojo o azul, cualquier intento de copia el examen será anulado. Leer todas las instrucciones.</p>
+    </div>
+
+    <!-- SECCIÓN I -->
+    <div class="exam-section">
+        <div class="section-title">SECCIÓN I – VERDADERO O FALSO (10 preguntas) 1 % C/U Total 10%</div>
+        <div class="instructions">Instrucciones: Marca con un 1 si la afirmación es verdadera o con un 0 si es falsa. Justifique su respuesta si es 0.</div>
+
+        <div class="question-block">
+            <div class="question-text">1. La Ingeniería de Software es equivalente a la programación o codificación de software.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> 0 (Falso)
+                <div class="justification"><strong>Justificación:</strong> La programación es solo una fase dentro del ciclo de vida del desarrollo. La Ingeniería de Software abarca un enfoque disciplinado y sistemático que incluye la elicitación de requisitos, diseño, arquitectura, pruebas, despliegue, gestión de proyectos y mantenimiento.</div>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">2. El modelo de desarrollo Waterfall es el más recomendado para proyectos con requisitos cambiantes y entornos de alta incertidumbre.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> 0 (Falso)
+                <div class="justification"><strong>Justificación:</strong> El modelo de desarrollo Waterfall (Cascada) es lineal y rígido, asumiendo que los requisitos están fijos desde el inicio. Para entornos de alta incertidumbre y requisitos cambiantes se recomiendan los marcos y metodologías ágiles (como Scrum).</div>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">3. El principio de Responsabilidad Única (SRP) establece que una clase debe tener una sola razón para cambiar.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> 1 (Verdadero)
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">4. El diagrama de secuencia en UML muestra la estructura estática de las clases y sus relaciones.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> 0 (Falso)
+                <div class="justification"><strong>Justificación:</strong> El diagrama de secuencia es un diagrama dinámico y de comportamiento que muestra la interacción temporal entre objetos, no la estructura estática (esta última es el propósito del diagrama de clases).</div>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">5. Los requisitos no funcionales son menos importantes que los funcionales en un sistema de software.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> 0 (Falso)
+                <div class="justification"><strong>Justificación:</strong> Ambos tipos de requisitos tienen el mismo nivel de importancia. Los no funcionales determinan atributos críticos como seguridad, rendimiento, escalabilidad y disponibilidad; un sistema puede cumplir sus funciones pero ser inutilizable si falla en estos aspectos.</div>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">6. La deuda técnica se refiere exclusivamente a errores de programación cometidos por desarrolladores novatos.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> 0 (Falso)
+                <div class="justification"><strong>Justificación:</strong> La deuda técnica es un concepto de diseño y arquitectura estratégico o accidental que surge por decisiones apresuradas, falta de refactorización o cambios de requisitos en el tiempo; puede ser asumida de forma consciente por desarrolladores experimentados para acelerar una entrega.</div>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">7. En Clean Architecture, las dependencias deben apuntar hacia las capas externas (frameworks y bases de datos).</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> 0 (Falso)
+                <div class="justification"><strong>Justificación:</strong> En Clean Architecture rige la Regla de Dependencia, la cual establece que las dependencias del código fuente solo deben apuntar hacia adentro, es decir, hacia las capas de las entidades y casos de uso (las capas internas no deben conocer nada de los frameworks o bases de datos externos).</div>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">8. El lenguaje Gherkin se utiliza para escribir criterios de aceptación en formato BDD (Behavior-Driven Development).</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> 1 (Verdadero)
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">9. La IA generativa es capaz de tomar decisiones de arquitectura compleja sin necesidad de supervisión humana.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> 0 (Falso)
+                <div class="justification"><strong>Justificación:</strong> La IA generativa actúa como un asistente y generador de sugerencias basado en patrones, pero carece de contexto de negocio profundo, criterio crítico y responsabilidad legal, requiriendo siempre supervisión y validación por parte de un arquitecto o ingeniero humano.</div>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">10. El diagrama de clases en UML utiliza multiplicidades como "1", "0..*" y "1..*" para definir cardinalidades en las relaciones entre clases.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> 1 (Verdadero)
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN II -->
+    <div class="exam-section">
+        <div class="section-title">SECCIÓN II – COMPLETACIÓN (10 preguntas) 1 % C/U Total 10%</div>
+        <div class="instructions">Instrucciones: Completa la palabra o frase que falta en cada enunciado.</div>
+
+        <div class="question-block">
+            <div class="question-text">A. El acrónimo SOLID corresponds a: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation y _____________.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> Dependency Inversion (Inversión de Dependencias)
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">B. Las cinco fases del SDLC (Ciclo de Vida del Software) son: Requisitos, Diseño, _____________, Pruebas y Mantenimiento.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> Desarrollo / Implementación / Codificación
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">C. El formato estándar para escribir historias de usuario es: "Como _____________, quiero _____________ para _____________".</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> [rol / usuario] , [funcionalidad / objetivo] , [beneficio / valor]
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">D. El diagrama UML que muestra el ciclo de vida de un objeto, incluyendo estados y transiciones, se llama diagrama de _____________.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> Estados / Máquina de Estados (State Machine Diagram)
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">E. En Gherkin, los escenarios se construyen con las palabras clave Given, When, Then y _____________.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> And / But (Y / Pero)
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">F. La técnica de elicitación de requisitos que consiste en observar cómo trabaja realmente el usuario (no cómo dice que trabaja) se llama _____________.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> Observación directa / Sombreado (Job Shadowing)
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">G. El principio SOLID que establece que "las entidades de software deben estar abiertas para extensión pero cerradas para modificación" es el principio _____________ (escribe el nombre completo o la sigla).</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> Open/Closed Principle (OCP) / Principio Abierto/Cerrado
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">H. El modelo de desarrollo que utiliza sprints cortos y feedback continuo del cliente se llama _____________.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> Scrum / Desarrollo Ágil (Agile)
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">I. El diagrama UML que muestra la interacción entre objetos en orden temporal se llama diagrama de _____________.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> Secuencia (Sequence Diagram)
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">J. En la priorización MoSCoW, las siglas significan: Must have, Should have, Could have y _____________.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta:</span> Won't have (o Won't have this time)
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN III -->
+    <div class="exam-section">
+        <div class="section-title">SECCIÓN III – ENUMERACIÓN (8 preguntas) 3,75 % C/U Total 30%</div>
+        <div class="instructions">Instrucciones: Enumera los elementos solicitados para cada pregunta. Debes listar al menos la cantidad indicada.</div>
+
+        <div class="question-block">
+            <div class="question-text">1. Enumera las 5 técnicas de elicitación de requisitos mencionadas en la clase.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta sugerida:</span>
+                <ol>
+                    <li>Entrevistas</li>
+                    <li>Cuestionarios / Encuestas</li>
+                    <li>Talleres de trabajo (Workshops / JAD)</li>
+                    <li>Observación directa (Job Shadowing)</li>
+                    <li>Análisis de documentación existente / Lluvia de ideas (Brainstorming)</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">2. Enumera los 5 principios SOLID con sus nombres completos.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta sugerida:</span>
+                <ol>
+                    <li><strong>SRP:</strong> Single Responsibility Principle (Principio de Responsabilidad Única)</li>
+                    <li><strong>OCP:</strong> Open/Closed Principle (Principio de Abierto/Cerrado)</li>
+                    <li><strong>LSP:</strong> Liskov Substitution Principle (Principio de Sustitución de Liskov)</li>
+                    <li><strong>ISP:</strong> Interface Segregation Principle (Principio de Segregación de Interfaces)</li>
+                    <li><strong>DIP:</strong> Dependency Inversion Principle (Principio de Inversión de Dependencias)</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">3. Enumera 5 tipos de diagramas UML y señala si son estructurales o de comportamiento.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta sugerida:</span>
+                <ol>
+                    <li>Diagrama de Clases (Estructural)</li>
+                    <li>Diagrama de Componentes (Estructural)</li>
+                    <li>Diagrama de Secuencia (De comportamiento / Interacción)</li>
+                    <li>Diagrama de Casos de Uso (De comportamiento)</li>
+                    <li>Diagrama de Estados (De comportamiento)</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">4. Enumera los roles principales en un equipo de software moderno (mínimo 6).</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta sugerida:</span>
+                <ol>
+                    <li>Product Owner (Dueño del Producto)</li>
+                    <li>Scrum Master / Facilitador Ágil</li>
+                    <li>Desarrollador de Software (Frontend / Backend / Fullstack)</li>
+                    <li>Ingeniero de Aseguramiento de Calidad (QA Engineer / Tester)</li>
+                    <li>Arquitecto de Software</li>
+                    <li>Diseñador de Experiencia de Usuario e Interfaz (UI/UX Designer)</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">5. Enumera 5 patrones de diseño GoF (Gang of Four) mencionados o implicados en las clases 01 a 04.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta sugerida:</span>
+                <ol>
+                    <li>Singleton</li>
+                    <li>Factory Method</li>
+                    <li>Strategy</li>
+                    <li>Observer</li>
+                    <li>Adapter</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">6. Enumera las 4 capas de Clean Architecture (de adentro hacia afuera).</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta sugerida:</span>
+                <ol>
+                    <li>Entidades (Entities)</li>
+                    <li>Casos de Uso (Use Cases)</li>
+                    <li>Adaptadores de Interfaz (Interface Adapters / Presenters / Controllers)</li>
+                    <li>Frameworks y Drivers (External Interfaces / Web / DB / UI)</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">7. Enumera las 4 categorías de la priorización MoSCoW. Si no ha escrito nada en el examen, realice únicamente esta pregunta.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta sugerida:</span>
+                <ol>
+                    <li><strong>M</strong>ust have (Debe tener - Crítico)</li>
+                    <li><strong>S</strong>hould have (Debería tener - Alta prioridad)</li>
+                    <li><strong>C</strong>ould have (Podría tener - Deseable)</li>
+                    <li><strong>W</strong>on't have (No se tendrá por ahora)</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">8. Enumera 5 tipos de requisitos no funcionales según la taxonomía ISO 25010 vista en clase.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta sugerida:</span>
+                <ol>
+                    <li>Adecuación funcional / Rendimiento y Eficiencia</li>
+                    <li>Seguridad</li>
+                    <li>Fiabilidad / Confiabilidad</li>
+                    <li>Usabilidad</li>
+                    <li>Mantenibilidad / Portabilidad</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN IV -->
+    <div class="exam-section">
+        <div class="section-title">SECCIÓN IV – PREGUNTAS EXPOSITIVAS (4 preguntas) 5% C/U Total 20%</div>
+        <div class="instructions">Instrucciones: Responde de forma desarrollada y fundamentada. Extensión sugerida: 1 a 2 párrafos por pregunta.</div>
+
+        <div class="question-block">
+            <div class="question-text">1. Explica en detalle el principio de Inversión de Dependencias (DIP) de SOLID. Incluye un ejemplo concreto de cómo se aplica en código TypeScript y argumenta por qué es fundamental para la mantenibilidad del software.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta desarrollada:</span>
+                <p style="margin-bottom: 10px;">El principio de Inversión de Dependencias (DIP) establece dos reglas fundamentales: los módulos de alto nivel (la lógica de negocio central) no deben depender de módulos de bajo nivel (detalles de infraestructura como bases de datos o servicios externos), sino que ambos deben depender de abstracciones (interfaces). Asimismo, las abstracciones no deben depender de los detalles, sino los detalles de las abstracciones.</p>
+                
+                <p style="margin-bottom: 15px;">DIP es fundamental para la mantenibilidad porque desacopla el software. Permite modificar o reemplazar componentes tecnológicos enteros sin alterar ni una sola línea de código de la lógica de negocio, reduciendo drásticamente la regresión de errores.</p>
+
+                <div class="code-block">// ABSTRACCIÓN (Interface)
+interface UserRepository {
+    save(user: any): void;
+}
+
+// DETALLE / BAJO NIVEL (Implementación concreta)
+class MySQLUserRepository implements UserRepository {
+    save(user: any) {
+        console.log("Guardando usuario en MySQL...");
+    }
+}
+
+// ALTO NIVEL (Lógica de negocio orientada a la abstracción)
+class UserService {
+    private userRepository: UserRepository;
+
+    constructor(userRepository: UserRepository) {
+        this.userRepository = userRepository;
+    }
+
+    createUser(user: any) {
+        this.userRepository.save(user);
+    }
+}</div>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">2. Describe el proceso completo de Ingeniería de Requisitos, desde la elicitación hasta la validación. Explica cómo la IA puede asistir en cada fase y menciona al menos dos técnicas de elicitación con ejemplos concretos.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta desarrollada:</span>
+                <p style="margin-bottom: 10px;">La Ingeniería de Requisitos es un ciclo de vida estructurado que comprende cuatro fases principales: 1) <strong>Elicitación</strong> (descubrimiento y recopilación de necesidades mediante técnicas con stakeholders); 2) <strong>Análisis y Negociación</strong> (estudio de la viabilidad y priorización); 3) <strong>Especificación</strong> (documentación formal de requisitos mediante SRS o Historias de Usuario); y 4) <strong>Validación</strong> (revisión conjunta con el cliente para asegurar que el documento refleja fielmente sus necesidades reales).</p>
+                
+                <p style="margin-bottom: 10px;">La Inteligencia Artificial puede potenciar cada fase de manera sustancial. En la elicitación, un LLM puede sugerir preguntas clave. En el análisis, identifica inconsistencias lógicas. En la especificación, transforma notas informales en historias estructuradas. Finalmente, ayuda a generar listas de verificación o casos de prueba automáticos basados en la documentación.</p>
+
+                <p><strong>Ejemplos de técnicas de elicitación:</strong><br>
+                • <em>Entrevistas estructuradas:</em> Reunirse con el gerente financiero para preguntarle qué reportes fiscales obligatorios debe generar el sistema.<br>
+                • <em>Observación directa (Job Shadowing):</em> Sentarse junto a un cajero para registrar cuántas pulsaciones le toma procesar una devolución.</p>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">3. Explica la diferencia entre los diagramas de Clases, Secuencia y Estados en UML. Para cada uno, describe su propósito, qué elementos lo componen y proporciona un ejemplo de cuándo utilizarías cada uno en el desarrollo de un sistema de e-commerce.</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuesta desarrollada:</span>
+                <p style="margin-bottom: 10px;">La diferencia principal radica en la perspectiva del sistema que capturan: el diagrama de clases es estático, mientras que los de secuencia y estados son de tipo dinámico.</p>
+                <ul>
+                    <li><strong>Diagrama de Clases:</strong> Modela la estructura estática. Compuesto por clases (atributos y métodos) y sus relaciones. En un e-commerce se usa para modelar las entidades <code>Producto</code> y <code>Carrito</code>.</li>
+                    <li><strong>Diagrama de Secuencia:</strong> Ilustra el intercambio de mensajes entre objetos ordenados cronológicamente. Compuesto por líneas de vida, activaciones y mensajes. Se utiliza para detallar el flujo exacto del proceso de pago invocando a la API de pasarela de pago.</li>
+                    <li><strong>Diagrama de Estados:</strong> Representa el ciclo de vida de un objeto reactivo individual en respuesta a eventos. Compuesto por estados, transiciones y acciones. Se aplica para modelar el flujo de un <code>Pedido</code> (<i>'Pendiente'</i>, <i>'Pagado'</i>, <i>'Enviado'</i>, <i>'Entregado'</i>).</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">4. Analiza el siguiente escenario y responde: <br><br>
+            "Una startup está desarrollando un sistema de gestión de salud digital. El equipo es pequeño (5 desarrolladores) y los requisitos cambian frecuentemente por regulaciones y feedback de usuarios. Tienen 3 meses para tener un MVP (Producto Mínimo Viable)."<br><br>
+            Basado en los conceptos vistos en clase, recomienda:<br>
+            a) ¿Qué modelo de ciclo de vida utilizarías y por qué?<br>
+            b) ¿Qué principios de diseño aplicarías para asegurar mantenibilidad?<br>
+            c) ¿Cómo integrarías IA en el proceso de desarrollo?<br>
+            d) ¿Qué diagramas UML priorizarías para la documentación?</div>
+            <div class="answer-box">
+                <span class="answer-label">Respuestas recomendadas al escenario:</span>
+                <p style="margin-bottom: 10px;"><strong>a) Ciclo de vida:</strong> Se debe elegir <strong>Scrum</strong> con sprints de 1 o 2 semanas. Un enfoque iterativo e incremental garantiza entregar valor rápido y pivotar sin desperdiciar recursos frente a regulaciones cambiantes.</p>
+                
+                <p style="margin-bottom: 10px;"><strong>b) Principios de diseño:</strong> Se deben aplicar principios <strong>SOLID</strong> acoplados a una <strong>Clean Architecture</strong>. Esto garantizará que las normativas regulatorias de salud estén aisladas de la base de datos o de la interfaz de usuario.</p>
+                
+                <p style="margin-bottom: 10px;"><strong>c) Integración de IA:</strong> Se utilizarán asistentes de código (como GitHub Copilot) para acelerar la escritura de pruebas unitarias y código repetitivo, optimizando el desarrollo del MVP.</p>
+                
+                <p style="margin-bottom: 0;"><strong>d) Diagramas UML prioritarios:</strong> Se priorizará un enfoque ágil documentando el <strong>Diagrama de Clases</strong> (modelo de dominio base), <strong>Historias de Usuario / Casos de Uso</strong> para delimitar el alcance del MVP, y un <strong>Diagrama de Secuencia</strong> para el flujo crítico de manejo y encriptación de datos sensibles de salud.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- COMPORTAMIENTO JAVASCRIPT MODULARIZADO -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        
+        // 1. ANIMACIÓN DE CARGA (Loader fadeout)
+        const loader = document.getElementById("loader");
+        setTimeout(() => {
+            loader.style.opacity = "0";
+            loader.style.visibility = "hidden";
+        }, 600);
+
+        // 2. SISTEMA DE CAMBIO DE TEMA (Modo Claro / Oscuro con LocalStorage)
+        const themeBtn = document.getElementById("themeBtn");
+        const themeIcon = document.getElementById("themeIcon");
+        const themeText = document.getElementById("themeText");
+        
+        // Función para aplicar tema activo
+        const setTheme = (theme) => {
+            if (theme === "dark") {
+                document.documentElement.setAttribute("data-theme", "dark");
+                themeIcon.textContent = "☀️";
+                themeText.textContent = "Modo Claro";
+                localStorage.setItem("theme", "dark");
+            } else {
+                document.documentElement.removeAttribute("data-theme");
+                themeIcon.textContent = "🌙";
+                themeText.textContent = "Modo Oscuro";
+                localStorage.setItem("theme", "claro");
+            }
+        };
+
+        // Detección automática o recuperación de preferencia guardada
+        const savedTheme = localStorage.getItem("theme");
+        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        
+        if (savedTheme === "dark" || (!savedTheme && systemPrefersDark)) {
+            setTheme("dark");
+        } else {
+            setTheme("claro");
+        }
+
+        // Evento click con microinteracción de transición suave
+        themeBtn.addEventListener("click", () => {
+            const currentTheme = document.documentElement.getAttribute("data-theme");
+            if (currentTheme === "dark") {
+                setTheme("claro");
+            } else {
+                setTheme("dark");
+            }
+        });
+
+        // 3. ANIMACIÓN GRADUAL (Fade In al hacer scroll con IntersectionObserver)
+        const sections = document.querySelectorAll(".exam-section");
+        
+        const sectionObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("visible");
+                    observer.unobserve(entry.target); // Solo anima una vez al entrar
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: "0px 0px -40px 0px"
+        });
+
+        sections.forEach(section => {
+            sectionObserver.observe(section);
+        });
+    });
+</script>
+
+</body>
+</html>
