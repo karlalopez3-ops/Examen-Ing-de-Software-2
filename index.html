@@ -5,29 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Examen - Ingeniería de Software II</title>
     <style>
-        /* Variables con la paleta Olive Garden */
+        /* Variables de la Paleta Olive Garden y Temas */
         :root {
-            --parchment: #F4F1EA;
+            /* Modo Claro Base */
+            --bg-global: #F4F1EA;       /* Parchment */
+            --bg-card: #FFFFFF;         /* Blanco limpio */
+            --bg-instruction: #EFECE4;  /* Parchment un poco más oscuro */
+            --bg-justification: #FAF9F6;
+            --text-main: #24291E;       /* Olivewood */
+            --text-muted: #555555;
+            --navbar-bg: #24291E;       /* Olivewood */
+            --navbar-text: #D9CDBC;     /* Sand */
+            
+            /* Colores de Acento Estables */
             --sand: #D9CDBC;
             --olive: #B2C2A2;
             --sage: #89967E;
             --bark: #655E51;
             --olivewood: #24291E;
-            --white: #FFFFFF;
         }
 
-        /* Configuración Global y Scroll Suave */
+        /* Variables Aplicadas al Activar el Modo Oscuro */
+        [data-theme="dark"] {
+            --bg-global: #181B14;       /* Variante ultra oscura de Olivewood */
+            --bg-card: #24291E;         /* Olivewood */
+            --bg-instruction: #2E3426;  /* Variante de Olivewood para resaltar */
+            --bg-justification: #1E2219;
+            --text-main: #F4F1EA;       /* Parchment */
+            --text-muted: #C5BEB3;      /* Sand suavizado */
+            --navbar-bg: #11140E;
+            --navbar-text: #B2C2A2;     /* Olive */
+        }
+
+        /* Configuración General y Scroll Suave */
         html {
             scroll-behavior: smooth;
         }
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--parchment);
-            color: var(--olivewood);
+            background-color: var(--bg-global);
+            color: var(--text-main);
             margin: 0;
             padding: 0;
             line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* Menú de Navegación Fijo Superior */
@@ -36,9 +58,10 @@
             top: 0;
             left: 0;
             width: 100%;
-            background-color: var(--olivewood);
+            background-color: var(--navbar-bg);
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             z-index: 1000;
+            transition: background-color 0.3s ease;
         }
 
         .navbar-container {
@@ -51,7 +74,7 @@
         }
 
         .navbar-brand {
-            color: var(--parchment);
+            color: #F4F1EA;
             font-weight: bold;
             font-size: 1.2rem;
             text-decoration: none;
@@ -66,7 +89,7 @@
         }
 
         .navbar-menu a {
-            color: var(--sand);
+            color: var(--navbar-text);
             text-decoration: none;
             font-weight: 500;
             transition: color 0.3s ease;
@@ -77,12 +100,38 @@
             color: var(--olive);
         }
 
+        /* Botón Flotante para cambiar de Modo (Claro/Oscuro) */
+        .theme-toggle-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background-color: var(--sage);
+            color: #FFFFFF;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 1010;
+            transition: transform 0.2s ease, background-color 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.05);
+            background-color: var(--bark);
+        }
+
         /* Encabezado Principal */
         .header-hero {
             background-color: var(--bark);
-            color: var(--parchment);
+            color: #F4F1EA;
             text-align: center;
-            padding: 120px 20px 60px 20px; /* Margen superior para no taparse con la barra */
+            padding: 120px 20px 60px 20px;
             border-bottom: 5px solid var(--sage);
         }
 
@@ -104,25 +153,25 @@
             padding: 40px 20px;
         }
 
-        /* Estilos de Sección Independiente (Cada Página) */
+        /* Estilos de Sección Independiente (Páginas del Examen) */
         .exam-section {
-            background-color: var(--white);
+            background-color: var(--bg-card);
             border-radius: 8px;
             padding: 40px;
-            margin-bottom: 60px; /* Espaciado amplio entre secciones */
+            margin-bottom: 60px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             border-left: 6px solid var(--sage);
-            scroll-margin-top: 80px; /* Evita que la navbar tape el título al scrollear */
+            scroll-margin-top: 80px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
-        /* Alternancia de fondo sutil para identificar cambios */
+        /* Cambio de borde sutil para identificar la paginación impar/par */
         .exam-section:nth-child(even) {
-            background-color: #FDFDFB;
             border-left-color: var(--olive);
         }
 
         .section-title {
-            color: var(--bark);
+            color: var(--sage);
             border-bottom: 2px solid var(--sand);
             padding-bottom: 10px;
             margin-top: 0;
@@ -130,14 +179,19 @@
             font-size: 1.6rem;
         }
 
+        [data-theme="dark"] .section-title {
+            color: var(--olive);
+        }
+
         .instructions {
-            background-color: var(--parchment);
+            background-color: var(--bg-instruction);
             padding: 15px;
             border-radius: 6px;
             font-style: italic;
             margin-bottom: 25px;
             font-size: 0.95rem;
             border-left: 3px solid var(--bark);
+            transition: background-color 0.3s ease;
         }
 
         /* Estructura de Preguntas */
@@ -159,25 +213,26 @@
         }
 
         .answer {
-            background-color: rgba(178, 194, 162, 0.15); /* Olive con opacidad */
+            background-color: rgba(178, 194, 162, 0.25);
             padding: 8px 12px;
             border-radius: 4px;
             display: inline-block;
             font-weight: bold;
-            color: #414a37;
+            color: var(--text-main);
         }
 
         .justification {
             margin-top: 8px;
             font-size: 0.9rem;
-            color: #555;
-            background-color: #fafafa;
+            color: var(--text-muted);
+            background-color: var(--bg-justification);
             padding: 10px;
             border-radius: 4px;
             border-left: 3px solid var(--sand);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Lista de Enumeración y Expositivas */
+        /* Listas Estilizadas */
         .list-styled {
             padding-left: 20px;
         }
@@ -190,20 +245,24 @@
             margin-top: 8px;
             list-style-type: circle;
             padding-left: 20px;
-            color: #444;
+            color: var(--text-muted);
         }
     </style>
 </head>
 <body>
+
+    <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()">
+        🌙 Modo Oscuro
+    </button>
 
     <nav class="navbar">
         <div class="navbar-container">
             <a href="#inicio" class="navbar-brand">UJCV - Ing. Software II</a>
             <ul class="navbar-menu">
                 <li><a href="#inicio">Inicio</a></li>
-                <li><a href="#seccion1">Sección 1 (Pág. 1)</a></li>
-                <li><a href="#seccion2">Sección 2 (Pág. 2)</a></li>
-                <li><a href="#seccion3">Sección 3 (Pág. 3)</a></li>
+                <li><a href="#seccion1">Sección 1</a></li>
+                <li><a href="#seccion2">Sección 2</a></li>
+                <li><a href="#seccion3">Sección 3</a></li>
             </ul>
         </div>
     </nav>
@@ -374,14 +433,14 @@
 
             <div class="question-block">
                 <div class="question-text">1. Explica en detalle el principio de Inversión de Dependencias (DIP) de SOLID e incluye un ejemplo concreto.</div>
-                <div class="justification" style="background-color: var(--white); border-left-color: var(--bark)">
+                <div class="justification">
                     Este principio dicta que los módulos de alto nivel no deben depender de módulos de bajo nivel; ambos deben depender de abstracciones (interfaces). Por ejemplo, en TypeScript, una clase `ProcesadorPagos` no debe instanciar directamente a `MySQLDatabase`. En su lugar, se debe crear una interfaz `IDatabase` e inyectarla en el constructor, permitiendo cambiar el motor de base de datos sin afectar la lógica del negocio.
                 </div>
             </div>
 
             <div class="question-block">
                 <div class="question-text">2. Analiza el escenario de la Startup que desarrolla un sistema de gestión de salud digital (MVP en 3 meses con requisitos cambiantes). Recomienda el ciclo de vida idóneo.</div>
-                <div class="justification" style="background-color: var(--white); border-left-color: var(--bark)">
+                <div class="justification">
                     <strong>Recomendación:</strong> Se debe implementar un modelo **Ágil e Incremental (Scrum)**. Dado el límite estricto de 3 meses para lanzar un MVP y las fluctuaciones normativas constantes de la salud, Scrum permite realizar iteraciones bi-semanales (Sprints), garantizando la entrega temprana de valor funcional ajustable de forma interactiva y adaptativa junto a los usuarios clave.
                 </div>
             </div>
@@ -389,5 +448,20 @@
 
     </main>
 
+    <script>
+        function toggleTheme() {
+            const body = document.documentElement;
+            const btn = document.getElementById('themeToggle');
+            const currentTheme = body.getAttribute('data-theme');
+            
+            if (currentTheme === 'dark') {
+                body.removeAttribute('data-theme');
+                btn.innerHTML = '🌙 Modo Oscuro';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                btn.innerHTML = '☀️ Modo Claro';
+            }
+        }
+    </script>
 </body>
 </html>
